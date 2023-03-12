@@ -1,7 +1,11 @@
 package com.roberto.apiwithsecurity.service;
 
 import com.roberto.apiwithsecurity.dto.Product;
+import com.roberto.apiwithsecurity.entity.UserInfo;
+import com.roberto.apiwithsecurity.repository.UserInfoRepository;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +17,12 @@ import java.util.stream.IntStream;
 public class ProductService {
 
     List<Product> productList = null;
+
+    @Autowired
+    private UserInfoRepository repository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostConstruct
     public void loadProductsFromDB(){
@@ -33,5 +43,11 @@ public class ProductService {
                 .filter(product -> product.getProductId() == id)
                 .findAny()
                 .orElseThrow(() -> new RuntimeException("product " + id + " not found"));
+    }
+
+    public String addUser(UserInfo userInfo){
+        userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
+        repository.save(userInfo);
+        return "user added to system ";
     }
 }

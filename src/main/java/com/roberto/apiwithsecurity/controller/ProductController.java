@@ -1,12 +1,11 @@
 package com.roberto.apiwithsecurity.controller;
 
 import com.roberto.apiwithsecurity.dto.Product;
+import com.roberto.apiwithsecurity.entity.UserInfo;
 import com.roberto.apiwithsecurity.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,12 +21,19 @@ public class ProductController {
         return "Welcome this endpoint is not secure";
     }
 
+    @PostMapping("/new")
+    public String AddNewUser(@RequestBody UserInfo userInfo){
+        return service.addUser(userInfo);
+    }
+
     @GetMapping("/all")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<Product> getAllTheProducts(){
         return service.getProducts();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     public Product getProductById(@PathVariable int id) {
         return service.getProduct(id);
     }
